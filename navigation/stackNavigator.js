@@ -2,17 +2,23 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import connectionPage from '../screens/connectionPage/index';
+import mainPage from '../screens/MainPage/index';
+import publisherPage from '../screens/publisherPage/index';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
     return (
-        <Stack.Navigator initialRouteName="connectionPage">
+        <Stack.Navigator initialRouteName="mainPage">
             <Stack.Screen
-                name="connectionPage"
-                component={connectionPage}
-                options={{title:'Halaman Koneksi', headerTitleStyle:{color:'#ffff'}, headerStyle:{backgroundColor:'#000'}}}
+                name="mainPage"
+                component={mainPage}
+                options={{title:'MQTT App', headerTitleStyle:{color:'#ffff'}, headerStyle:{backgroundColor:'#000'}}}
+            />
+            <Stack.Screen
+                name="publisherPage"
+                component={publisherPage}
+                options={{title:'Halaman Publish', headerTitleStyle:{color:'#ffff'}, headerStyle:{backgroundColor:'#000'}}}
             />
         </Stack.Navigator>
     )
