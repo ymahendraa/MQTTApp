@@ -11,6 +11,7 @@ import {
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { RSA } from 'react-native-rsa-native';
+import ReactNativeBiometrics from 'react-native-biometrics';
 
 const genKey = (keyLength) => {
     var chars =
@@ -24,6 +25,21 @@ const genKey = (keyLength) => {
     return randomString;
 };
 
+const createSignature = () =>{
+  let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
+  let payload = epochTimeSeconds + 'some message'
+  ReactNativeBiometrics.createSignature({
+    promptMessage: 'Sign in',
+    payload: payload
+  })
+  .then((resultObject) => {
+    const { success, signature } = resultObject
+    if (success) {
+      console.log(signature)
+    //   verifySignatureWithServer(signature, payload)
+    }
+  })
+}
 
 const Register = () => {
   
@@ -67,7 +83,7 @@ const Register = () => {
                       <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} ></TextInput>   
                   </View>
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
-                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={()=>{saveKey(),AEncrpytKey(key)}}/>
+                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={createSignature}/>
                        
                   </View>
                   <Text>key : {key}</Text>
