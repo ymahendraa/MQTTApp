@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-import { RSA } from 'react-native-rsa-native';
+// import { RSA } from 'react-native-rsa-native';
 import ReactNativeBiometrics from 'react-native-biometrics';
+
+
 
 const genKey = (keyLength) => {
     var chars =
@@ -24,22 +26,6 @@ const genKey = (keyLength) => {
     }
     return randomString;
 };
-
-const createSignature = () =>{
-  let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-  let payload = epochTimeSeconds + 'some message'
-  ReactNativeBiometrics.createSignature({
-    promptMessage: 'Sign in',
-    payload: payload
-  })
-  .then((resultObject) => {
-    const { success, signature } = resultObject
-    if (success) {
-      console.log(signature)
-    //   verifySignatureWithServer(signature, payload)
-    }
-  })
-}
 
 const Register = () => {
   
@@ -55,22 +41,12 @@ const Register = () => {
     }
 
     const AEncrpytKey = (key) => {
+      var RSA = require('react-native-rsa');
       let message = key;
- 
-      RSA.generateKeys(1024) // set key size
-      .then(keys => {
-          console.log('1024 private:', keys.private); // the private key
-          console.log('1024 public:', keys.public); // the public key
-          RSA.encrypt(message, keys.public)
-          .then(encodedMessage => {
-              console.log(`the encoded message is ${encodedMessage}`);
-              RSA.decrypt(encodedMessage, keys.private)
-              .then(decryptedMessage => {
-                  console.log(`The original message was ${decryptedMessage}`);
-              });
-          });
-      });
-    }
+      // let pKey = 'MIIDUTCCAjkCFHQlox5YfwcefcV3713UjRuHv3r/MA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYTAklEMRcwFQYDVQQIDA5Tb3V0aC1TdWxhd2VzaTERMA8GA1UEBwwITWFrYXNzYXIxGjAYBgNVBAsMEVRlbGtvbV9Vbml2ZXJzaXR5MQ4wDAYDVQQDDAVNQUhFTjAeFw0yMTA0MTIxNDM4MjVaFw00ODA4MjcxNDM4MjVaMGUxCzAJBgNVBAYTAklEMRcwFQYDVQQIDA5Tb3V0aC1TdWxhd2VzaTERMA8GA1UEBwwITWFrYXNzYXIxGjAYBgNVBAsMEVRlbGtvbV9Vbml2ZXJzaXR5MQ4wDAYDVQQDDAVNQUhFTjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOpH1tlQZF2IuT8+SopqPd8JPX9SkMVtXdtI6Ei4AdZrH4E28eCwKm9sEtWmv1g1C3Z9EH0Ut/DxHhi07OP5bcAB4hXh5NeAuX7ajZwjua09CWg74s7aBEIPoLoE3HHO1zzEsfKQ/gonPU3RkNt6wLKmXpjjSToiRaWMtLXfK4RshngoMDthZ/gSVwSbH3lRRpYzv/ZlQDJX7iTFNE1FxAr0tVFrvJQEGDBcX3SQWIamh7bdJoUl0rokYiPQUwdbYU+cGVFzHMh5+nJqsbi1h2kGVSjKpSi7yg6fH6abT88dnJEruKWBcC76h8JxOIgooy2e5squwqOisxE077Bq/N0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAzq/ivkE274O05mALVvPYPObviMd622VU+y5dCm8f6ITChjoc73nbZJbnZwSSUhu1qYiQ99P9lPNHoe/qmJ9jjsvoxK3BqQJAqZiQflN29d2Pdng2OSbZ4VmeN2jF3e7AoryHgHWlP37Zgv3gy+Nw3iquGRav41pTHQexil62pmSTKo0y/BN84ff4iVQc2BrCIdOZA5raG/eSNDMTiXyKXcR9/ODBQt4RiR9TX47h71p+8DdajFgQepfl32iozlO4vcI8u40SwoQwMM1ngm9HduATUYe9QyR29xVge261JC/TDNyllIVCtEjM2rQKy44gKe9Fj3C1T4uavy9S+GV1IA=='
+      // let publicKey = JSON.stringify(pKey);
+      
+      }
   
       return (
           <ScrollView style={{flex:1}}>
@@ -83,7 +59,7 @@ const Register = () => {
                       <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} ></TextInput>   
                   </View>
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
-                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={createSignature}/>
+                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000"/>
                        
                   </View>
                   <Text>key : {key}</Text>

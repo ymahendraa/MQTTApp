@@ -14,14 +14,19 @@ import { Button } from 'react-native-elements';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import ConnectionComponent from '../../components/connectionComponent/index';
 import RegisterComponent from '../../components/registerComponent/index';
+import LoginComponent from '../../components/loginComponent/index';
 
 const FirstRoute = () => (
   <RegisterComponent/>
 );
 
 const SecondRoute = () => (
-  <ConnectionComponent/>
+  <LoginComponent/>
 );
+
+const ThirdRoute = () => (
+  <ConnectionComponent/>
+)
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -29,12 +34,14 @@ const mainPage = () => {
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'first', title: 'Registrasi' },
-    { key: 'second', title: 'Koneksi' },
+    { key: 'second', title: 'Login' },
+    { key: 'third', title: 'Koneksi'}
   ]);
 
   const renderScene = SceneMap({
     first: FirstRoute,
     second: SecondRoute,
+    third: ThirdRoute
   });
 
   const renderTabBar = (props) => (
