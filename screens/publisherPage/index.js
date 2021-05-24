@@ -24,8 +24,6 @@ const publisherPage = ({route}) => {
   const [topic, setTopic] = useState('');
   const [data, setData] = useState('');
   const [QoS, setQoS] = useState('');
-  
-  
 
   const MQTT = () => {
         mqtt.createClient({

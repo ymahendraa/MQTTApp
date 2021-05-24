@@ -12,8 +12,7 @@ import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 // import { RSA } from 'react-native-rsa-native';
 import ReactNativeBiometrics from 'react-native-biometrics';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const genKey = (keyLength) => {
     var chars =
@@ -31,14 +30,40 @@ const Register = () => {
   
     const [clientID, setClientID] = useState('');
     const [key, setKey] = useState('');
+    const [authData, setAuthData] = useState({});
 
     const saveKey = () => {
       var gKey ='';
       gKey = genKey(20);
-      gKey = clientID + ':::' + gKey;
+      console.log(gKey)
+      // gKey = clientID + ':::' + gKey;
       setKey(gKey)
-      console.log(key)
     }
+
+    const saveAuthData = async () => {
+      let dataToSave = {
+        "clientId" : clientID,
+        "key" : key
+      }
+      try {
+          await AsyncStorage.setItem(clientID, JSON.stringify(dataToSave))
+          console.log('Data successfully saved')
+      } catch (e) {
+        // saving error
+      }
+    }
+
+    const getAuthData = async () => {
+      try {
+        const value = await AsyncStorage.getItem(clientID)
+      if(value !== null) {
+          // value previously stored
+          console.log(value);
+      }
+      } catch(e) {
+      // error reading value
+      }
+  }
 
     const AEncrpytKey = (key) => {
       var RSA = require('react-native-rsa');
@@ -56,13 +81,13 @@ const Register = () => {
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Client ID</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
-                      <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} ></TextInput>   
+                      <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} onEndEditing={saveKey}></TextInput>   
                   </View>
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
-                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000"/>
-                       
+                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={saveAuthData}/>
+                    <Button buttonStyle={styles.butlog} title="Showdata" color="#000"onPress={getAuthData}/>
                   </View>
-                  <Text>key : {key}</Text>
+                  {/* <Text>key : {key}</Text> */}
                   <View style={{ flex : 1 }} />
                 </View>    
               </View>

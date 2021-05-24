@@ -15,11 +15,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {axios} from 'react-native-axios';
 import base64 from 'react-native-base64';
 
-const data = {
-    "username": "tesst",
-    "password": "tesst"
-}
-
 const storeDataUrl = async (value) => {
     try {
         await AsyncStorage.setItem('@url', value)
@@ -29,9 +24,6 @@ const storeDataUrl = async (value) => {
     }
 }
 
-
-
-
 const Login = () => {
   
     const [clientID, setClientID] = useState('');
@@ -40,20 +32,24 @@ const Login = () => {
 
     const getData = async () => {
         try {
-        const value = await AsyncStorage.getItem('@url')
-        if(value !== null) {
-            // value previously stored
-            setUrl(value);
-            console.log(value);
-            console.log(url);
-        }
+            const value = await AsyncStorage.getItem(clientID);
+            if(value != null){
+                const jsonValue = JSON.parse(value);
+                setKey(jsonValue.key)
+                console.log(jsonValue.key)
+            }
+            
         } catch(e) {
         // error reading value
         }
     }
 
-    const Login = () => {
-        return fetch('https://1b0f7cb88ad8.ngrok.io/users/authenticate', {
+    const login = () => {
+        let data = {
+            "username" : clientID,
+            "password" : key
+        }
+        return fetch('https://de6c1f816d7c.ngrok.io/users/authenticate', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -72,19 +68,46 @@ const Login = () => {
 
     const getBroker = () => {
         let headers = new Headers();
-        headers.set('Authorization', 'Basic ' + base64.encode(data.username + ":" + data.password));
-        fetch('https://1b0f7cb88ad8.ngrok.io/users', 
+        headers.set('Authorization', 'Basic ' + base64.encode(clientID + ":" + key+'1'));
+        fetch('https://de6c1f816d7c.ngrok.io/users', 
         {method:'GET',
         headers: headers,
-        // credentials: 'user:passwd'
         })
-        .then(response => response.json())
-        .then((json) => {
-            return console.log(json);
-        })
+        .then(response => {
+            if(response.status != 401){
+                ReactNativeBiometrics.simplePrompt({promptMessage: 'Masukkan sidik jari'})
+                .then((resultObject) => {
+                    const { success } = resultObject
+                    if (success) {
+                        console.log('successful biometrics provided')
+                        .then(response => response.json())
+                        .then((json) =>{
+                            return console.log(json)
+                        })
+                    } else {
+                        console.log('user cancelled biometric prompt')
+                    }
+                })
+                .catch(() => {
+                    console.log('biometrics failed')
+                })
+        }})
+        // .then((json) => {
+        //     return console.log(json);
+        // })
         .catch((error) => {
         console.error(error);
         });        
+    }
+
+    const mainFunction = async () =>{
+        try {
+            await getData();
+            getBroker();
+            // login();
+        } catch (error) {
+            
+        }
     }
 
     // const saveKey = () => {
@@ -108,7 +131,7 @@ const Login = () => {
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Client ID</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
-                      <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} ></TextInput>   
+                      <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)}  ></TextInput>   
                   </View>
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Password</Text>
@@ -116,7 +139,7 @@ const Login = () => {
                       <TextInput style={styles.textinp} onChangeText={(key)=> setKey(key)} ></TextInput>   
                   </View>
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
-                    <Button buttonStyle={styles.butlog} title="Login" color="#000" onPress={getBroker}/>
+                    <Button buttonStyle={styles.butlog} title="Login" color="#000" onPress={mainFunction}/>
                        
                   </View>
                   <View style={{ flex : 1 }} />
