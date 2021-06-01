@@ -10,9 +10,31 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
-// import { RSA } from 'react-native-rsa-native';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RSA } from 'react-native-rsa-native';
+
+const publicKey = `-----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+Df4ahX8/VRSMZbL8s+yK68sH
+        iRDWv1Mm82ALoz4sRfS0IiBe2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZM
+        g37WlQ4YCYiT8UrmzVDtgZmRg6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdg
+        mP5yab2lmaJUiRA2sQIDAQAB
+        -----END PUBLIC KEY-----`
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIICXAIBAAKBgQC+Df4ahX8/VRSMZbL8s+yK68sHiRDWv1Mm82ALoz4sRfS0IiBe
+2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZMg37WlQ4YCYiT8UrmzVDtgZmR
+g6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdgmP5yab2lmaJUiRA2sQIDAQAB
+AoGAI7ULTb5RJvv8LViaJUJEqeEdNyA4arBtlf7Zx7X242iNTh6vSEKrzn0kaG7J
++fnJwl8Bg7oPHE5vTHN6Qi+mbujQS55aPTD9he7llAFYKXvZhWtEKUEBVg4fNwNj
+pVKeKQ/HQV9Yb/Hy9TXaGc2xDX/BWKiGW88JvXKw1GNHFvECQQDkHUBXIR5SUxKN
+vQFLvTIA62E9OF7jruQ7i2EdSraOgA4bTuzilslSR4qc2tHJIYM18/2lYN6NCWcr
+GT6SIGNNAkEA1UmuNITmSYj/8cYQtE/LS0jEfZBR+Wb/mmH3fi+/6pd9JVqqgG4v
+LTK1uoKgJdQpsawpgjiMCVS9lK5ncULm9QJBALyAH4bgazoEQ7S0lrmLoiJ4X2ZD
+isYC478AskOOVcTztLSER+QGTl6bl8N+XxUhiFexQ8zBe6Z4OrS2q6n88ZECQAF7
+6cJjylZopZ9BCYy3oWp8ryFQh8F8ffrNA7PVETjIpQ5Fezo5igp+d9U8Y3Df8QpT
+cFZ/njnSZR9Lt1yKYqECQAcyD8Ot50W0HDlKc1Jh0vAkIsK0s5RwBFu+LzYGOQcQ
+lBjPHbx0FuSLqKWrHvnWh2j+mTx1FRPH6mefCdTWnV4=
+-----END RSA PRIVATE KEY-----`
 
 const genKey = (keyLength) => {
     var chars =
@@ -30,7 +52,7 @@ const Register = () => {
   
     const [clientID, setClientID] = useState('');
     const [key, setKey] = useState('');
-    const [authData, setAuthData] = useState({});
+    const [authData, setAuthData] = useState('');
 
     const saveKey = () => {
       var gKey ='';
@@ -63,16 +85,22 @@ const Register = () => {
       } catch(e) {
       // error reading value
       }
-  }
+    }
 
-    const AEncrpytKey = (key) => {
-      var RSA = require('react-native-rsa');
-      let message = key;
-      // let pKey = 'MIIDUTCCAjkCFHQlox5YfwcefcV3713UjRuHv3r/MA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYTAklEMRcwFQYDVQQIDA5Tb3V0aC1TdWxhd2VzaTERMA8GA1UEBwwITWFrYXNzYXIxGjAYBgNVBAsMEVRlbGtvbV9Vbml2ZXJzaXR5MQ4wDAYDVQQDDAVNQUhFTjAeFw0yMTA0MTIxNDM4MjVaFw00ODA4MjcxNDM4MjVaMGUxCzAJBgNVBAYTAklEMRcwFQYDVQQIDA5Tb3V0aC1TdWxhd2VzaTERMA8GA1UEBwwITWFrYXNzYXIxGjAYBgNVBAsMEVRlbGtvbV9Vbml2ZXJzaXR5MQ4wDAYDVQQDDAVNQUhFTjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOpH1tlQZF2IuT8+SopqPd8JPX9SkMVtXdtI6Ei4AdZrH4E28eCwKm9sEtWmv1g1C3Z9EH0Ut/DxHhi07OP5bcAB4hXh5NeAuX7ajZwjua09CWg74s7aBEIPoLoE3HHO1zzEsfKQ/gonPU3RkNt6wLKmXpjjSToiRaWMtLXfK4RshngoMDthZ/gSVwSbH3lRRpYzv/ZlQDJX7iTFNE1FxAr0tVFrvJQEGDBcX3SQWIamh7bdJoUl0rokYiPQUwdbYU+cGVFzHMh5+nJqsbi1h2kGVSjKpSi7yg6fH6abT88dnJEruKWBcC76h8JxOIgooy2e5squwqOisxE077Bq/N0CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAzq/ivkE274O05mALVvPYPObviMd622VU+y5dCm8f6ITChjoc73nbZJbnZwSSUhu1qYiQ99P9lPNHoe/qmJ9jjsvoxK3BqQJAqZiQflN29d2Pdng2OSbZ4VmeN2jF3e7AoryHgHWlP37Zgv3gy+Nw3iquGRav41pTHQexil62pmSTKo0y/BN84ff4iVQc2BrCIdOZA5raG/eSNDMTiXyKXcR9/ODBQt4RiR9TX47h71p+8DdajFgQepfl32iozlO4vcI8u40SwoQwMM1ngm9HduATUYe9QyR29xVge261JC/TDNyllIVCtEjM2rQKy44gKe9Fj3C1T4uavy9S+GV1IA=='
-      // let publicKey = JSON.stringify(pKey);
-      
+    const asymmEncrypt = async () => {
+      const message = `hello`
+      try {
+        const encodedMessage = await RSA.encrypt(message, publicKey);
+        console.log('android encoded message:', encodedMessage);
+        const decodedMessage = await RSA.decrypt(encodedMessage, privateKey);
+        console.log('android encoded message:', decodedMessage);
+      } catch (error) {
+        console.log(error)
       }
-  
+      
+    }
+
+    
       return (
           <ScrollView style={{flex:1}}>
               <View style={{ flex: 1,alignItems:'center'}}>
@@ -86,6 +114,7 @@ const Register = () => {
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
                     <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={saveAuthData}/>
                     <Button buttonStyle={styles.butlog} title="Showdata" color="#000"onPress={getAuthData}/>
+                    <Button buttonStyle={styles.butlog} title="Encrypted" color="#000"onPress={()=>{asymmEncrypt()}}/>
                   </View>
                   {/* <Text>key : {key}</Text> */}
                   <View style={{ flex : 1 }} />

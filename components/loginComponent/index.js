@@ -13,7 +13,30 @@ import { useNavigation } from '@react-navigation/native';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import base64 from 'react-native-base64';
+import { RSA } from 'react-native-rsa-native';
 
+
+const publicKey = `-----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+Df4ahX8/VRSMZbL8s+yK68sH
+        iRDWv1Mm82ALoz4sRfS0IiBe2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZM
+        g37WlQ4YCYiT8UrmzVDtgZmRg6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdg
+        mP5yab2lmaJUiRA2sQIDAQAB
+        -----END PUBLIC KEY-----`
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIICXAIBAAKBgQC+Df4ahX8/VRSMZbL8s+yK68sHiRDWv1Mm82ALoz4sRfS0IiBe
+2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZMg37WlQ4YCYiT8UrmzVDtgZmR
+g6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdgmP5yab2lmaJUiRA2sQIDAQAB
+AoGAI7ULTb5RJvv8LViaJUJEqeEdNyA4arBtlf7Zx7X242iNTh6vSEKrzn0kaG7J
++fnJwl8Bg7oPHE5vTHN6Qi+mbujQS55aPTD9he7llAFYKXvZhWtEKUEBVg4fNwNj
+pVKeKQ/HQV9Yb/Hy9TXaGc2xDX/BWKiGW88JvXKw1GNHFvECQQDkHUBXIR5SUxKN
+vQFLvTIA62E9OF7jruQ7i2EdSraOgA4bTuzilslSR4qc2tHJIYM18/2lYN6NCWcr
+GT6SIGNNAkEA1UmuNITmSYj/8cYQtE/LS0jEfZBR+Wb/mmH3fi+/6pd9JVqqgG4v
+LTK1uoKgJdQpsawpgjiMCVS9lK5ncULm9QJBALyAH4bgazoEQ7S0lrmLoiJ4X2ZD
+isYC478AskOOVcTztLSER+QGTl6bl8N+XxUhiFexQ8zBe6Z4OrS2q6n88ZECQAF7
+6cJjylZopZ9BCYy3oWp8ryFQh8F8ffrNA7PVETjIpQ5Fezo5igp+d9U8Y3Df8QpT
+cFZ/njnSZR9Lt1yKYqECQAcyD8Ot50W0HDlKc1Jh0vAkIsK0s5RwBFu+LzYGOQcQ
+lBjPHbx0FuSLqKWrHvnWh2j+mTx1FRPH6mefCdTWnV4=
+-----END RSA PRIVATE KEY-----`
 const storeDataUrl = async (value) => {
     try {
         await AsyncStorage.setItem('@url', value)
@@ -29,24 +52,75 @@ const Login = () => {
     const [key, setKey] = useState('');
     const [url, setUrl] = useState('');
     const [brokerProp, setBrokerProp] = useState({});
+    const [authPayload, setAuthPayload] = useState('')
 
-    const setBrokerProperties = () => {
+    const asymmEncrypt = async () => {
+        try {
+            let authPay = clientID + ':::' + key;
+            const encryptedAuthPay = await RSA.encrypt(authPay, publicKey);
+            console.log('android encoded message:', encryptedAuthPay);
+            const decryptedAuthPay = await RSA.decrypt(encryptedAuthPay, privateKey);
+            console.log('android decoded message:', decryptedAuthPay);
+            var base64enc = base64.encode(encryptedAuthPay);
+            console.log('base64:'+ base64enc)
+            var base64dec = base64.decode(base64enc);
+            console.log('base64 dec :' + base64dec)
+            setAuthPayload(base64enc);
 
-    }
+            
+
+        //   const encodedMessage = await RSA.encrypt(message, publicKey);
+        //   console.log('android encoded message:', encodedMessage);
+        //   const decodedMessage = await RSA.decrypt(encodedMessage, privateKey);
+        //   console.log('android encoded message:', decodedMessage);
+        } catch (error) {
+          console.log(error)
+        }
+        
+      }
 
     const alertTwoButton = (message) => {
-        Alert.alert(
-            "Login status",
-            message ? "Successfully logged in" : "Login failed, user not registered yet",
-            [
-              {
-                text: "Cancel",
-                onPress: () => console.log("Cancel Pressed"),
-                style: "cancel"
-              },
-              { text: "OK", onPress: () => null }
-            ]
-          );
+        if (message == 'ok') {
+            Alert.alert(
+                "Login status",
+                "Successfully logged in",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => null }
+                ]
+              );
+        } else if (message == 'not registered') {
+            Alert.alert(
+                "Login status",
+                "Login failed, user unauthorized",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => null }
+                ]
+              );
+        } else if (message == 'conn err') {
+            Alert.alert(
+                "Login status",
+                "Login failed, request timeout",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => null }
+                ]
+              );
+        }
+        
     }
 
     const alertBrokerProp = () => {
@@ -83,7 +157,7 @@ const Login = () => {
             "username" : clientID,
             "password" : key
         }
-        return fetch('https://50c94f5921b8.ngrok.io/users/authenticate', {
+        return fetch('https://df52dfa9871e.ngrok.io/users/authenticate', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -102,8 +176,10 @@ const Login = () => {
 
     const getBroker = () => {
         let headers = new Headers();
-        headers.set('Authorization', 'Basic ' + base64.encode(clientID + ":" + key));
-        fetch('https://50c94f5921b8.ngrok.io/users', 
+        headers.set('Authorization', 'Basic ' + authPayload);
+        // headers.set('Authorization', 'Basic ' + base64.encode(clientID + ':' + key));
+        // console.log(headers)
+        fetch('https://9d2edf384664.ngrok.io/users', 
         {method:'GET',
         headers: headers,
         })
@@ -119,7 +195,7 @@ const Login = () => {
                             setBrokerProp(json);
                             console.log(brokerProp)
                         })
-                        alertTwoButton(true)
+                        alertTwoButton('ok')
                     } else {
                         console.log('user cancelled biometric prompt');
                     }
@@ -127,9 +203,11 @@ const Login = () => {
                 .catch(() => {
                     console.log('biometrics failed');
                 })
-        }else{
-            alertTwoButton(false)
-        }
+            }else if (response.status == 401){
+                alertTwoButton('not registered');
+            }else if (response.status == 408){
+                alertTwoButton('conn err');
+            }
         })
         // .then((response) => response.json())
         // .then((json) => {
@@ -185,11 +263,13 @@ const Login = () => {
                         <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
                             <Button buttonStyle={styles.butlog} title="Broker Prop" color="#000" onPress={alertBrokerProp}/>
                         </View>
-                        <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
+                        {/* <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
                             <Button buttonStyle={styles.butlog} title="POST" color="#000" onPress={loginToServer}/>
-                        </View>
+                        </View> */}
                   </View>
-                  
+                  <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
+                            <Button buttonStyle={styles.butlog} title="encrypt" color="#000" onPress={asymmEncrypt}/>
+                    </View>
                   <View style={{ flex : 1 }} />
                 </View>    
               </View>
