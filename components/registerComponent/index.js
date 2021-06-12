@@ -9,32 +9,34 @@ import {
   ScrollView
 } from 'react-native';
 import { Button } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
-import ReactNativeBiometrics from 'react-native-biometrics';
+// import { useNavigation } from '@react-navigation/native';
+// import ReactNativeBiometrics from 'react-native-biometrics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RSA } from 'react-native-rsa-native';
+// import { RSA } from 'react-native-rsa-native';
+// import base64 from 'react-native-base64';
 
-const publicKey = `-----BEGIN PUBLIC KEY-----
-        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+Df4ahX8/VRSMZbL8s+yK68sH
-        iRDWv1Mm82ALoz4sRfS0IiBe2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZM
-        g37WlQ4YCYiT8UrmzVDtgZmRg6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdg
-        mP5yab2lmaJUiRA2sQIDAQAB
-        -----END PUBLIC KEY-----`
-const privateKey = `-----BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQC+Df4ahX8/VRSMZbL8s+yK68sHiRDWv1Mm82ALoz4sRfS0IiBe
-2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZMg37WlQ4YCYiT8UrmzVDtgZmR
-g6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdgmP5yab2lmaJUiRA2sQIDAQAB
-AoGAI7ULTb5RJvv8LViaJUJEqeEdNyA4arBtlf7Zx7X242iNTh6vSEKrzn0kaG7J
-+fnJwl8Bg7oPHE5vTHN6Qi+mbujQS55aPTD9he7llAFYKXvZhWtEKUEBVg4fNwNj
-pVKeKQ/HQV9Yb/Hy9TXaGc2xDX/BWKiGW88JvXKw1GNHFvECQQDkHUBXIR5SUxKN
-vQFLvTIA62E9OF7jruQ7i2EdSraOgA4bTuzilslSR4qc2tHJIYM18/2lYN6NCWcr
-GT6SIGNNAkEA1UmuNITmSYj/8cYQtE/LS0jEfZBR+Wb/mmH3fi+/6pd9JVqqgG4v
-LTK1uoKgJdQpsawpgjiMCVS9lK5ncULm9QJBALyAH4bgazoEQ7S0lrmLoiJ4X2ZD
-isYC478AskOOVcTztLSER+QGTl6bl8N+XxUhiFexQ8zBe6Z4OrS2q6n88ZECQAF7
-6cJjylZopZ9BCYy3oWp8ryFQh8F8ffrNA7PVETjIpQ5Fezo5igp+d9U8Y3Df8QpT
-cFZ/njnSZR9Lt1yKYqECQAcyD8Ot50W0HDlKc1Jh0vAkIsK0s5RwBFu+LzYGOQcQ
-lBjPHbx0FuSLqKWrHvnWh2j+mTx1FRPH6mefCdTWnV4=
------END RSA PRIVATE KEY-----`
+
+// const publicKey = `-----BEGIN PUBLIC KEY-----
+//         MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+Df4ahX8/VRSMZbL8s+yK68sH
+//         iRDWv1Mm82ALoz4sRfS0IiBe2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZM
+//         g37WlQ4YCYiT8UrmzVDtgZmRg6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdg
+//         mP5yab2lmaJUiRA2sQIDAQAB
+//         -----END PUBLIC KEY-----`
+// const privateKey = `-----BEGIN RSA PRIVATE KEY-----
+//         MIICXAIBAAKBgQC+Df4ahX8/VRSMZbL8s+yK68sHiRDWv1Mm82ALoz4sRfS0IiBe
+//         2QSpF6h1/kMWeF/kPTTYYlvnamEndOw4ghTkf0ZMg37WlQ4YCYiT8UrmzVDtgZmR
+//         g6JLB/S60OIpl99sGzlymWJOxJsQGiRTLd7PKhdgmP5yab2lmaJUiRA2sQIDAQAB
+//         AoGAI7ULTb5RJvv8LViaJUJEqeEdNyA4arBtlf7Zx7X242iNTh6vSEKrzn0kaG7J
+//         +fnJwl8Bg7oPHE5vTHN6Qi+mbujQS55aPTD9he7llAFYKXvZhWtEKUEBVg4fNwNj
+//         pVKeKQ/HQV9Yb/Hy9TXaGc2xDX/BWKiGW88JvXKw1GNHFvECQQDkHUBXIR5SUxKN
+//         vQFLvTIA62E9OF7jruQ7i2EdSraOgA4bTuzilslSR4qc2tHJIYM18/2lYN6NCWcr
+//         GT6SIGNNAkEA1UmuNITmSYj/8cYQtE/LS0jEfZBR+Wb/mmH3fi+/6pd9JVqqgG4v
+//         LTK1uoKgJdQpsawpgjiMCVS9lK5ncULm9QJBALyAH4bgazoEQ7S0lrmLoiJ4X2ZD
+//         isYC478AskOOVcTztLSER+QGTl6bl8N+XxUhiFexQ8zBe6Z4OrS2q6n88ZECQAF7
+//         6cJjylZopZ9BCYy3oWp8ryFQh8F8ffrNA7PVETjIpQ5Fezo5igp+d9U8Y3Df8QpT
+//         cFZ/njnSZR9Lt1yKYqECQAcyD8Ot50W0HDlKc1Jh0vAkIsK0s5RwBFu+LzYGOQcQ
+//         lBjPHbx0FuSLqKWrHvnWh2j+mTx1FRPH6mefCdTWnV4=
+//         -----END RSA PRIVATE KEY-----`
 
 const genKey = (keyLength) => {
     var chars =
@@ -48,15 +50,65 @@ const genKey = (keyLength) => {
     return randomString;
 };
 
+const alertTwoButton = (message) => {
+  switch (message) {
+    case "ok":
+      Alert.alert(
+        "Register status",
+        "Successfully register account",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "OK", onPress: () => null }
+        ]
+      );
+      break;
+    case "already registered":
+      Alert.alert(
+        "Register status",
+        "Username already registered",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "OK", onPress: () => null }
+        ]
+      );
+      break;
+    case "conn err":
+      Alert.alert(
+        "Register status",
+        "Connection Error",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "OK", onPress: () => null }
+        ]
+      );
+      break;
+  
+    default:
+      break;
+  }
+  
+}
 const Register = () => {
   
     const [clientID, setClientID] = useState('');
     const [key, setKey] = useState('');
-    const [authData, setAuthData] = useState('');
+    // const [authPayload, setAuthPayload] = useState('');
 
     const saveKey = () => {
       var gKey ='';
-      gKey = genKey(20);
+      gKey = genKey(16);
       console.log(gKey)
       // gKey = clientID + ':::' + gKey;
       setKey(gKey)
@@ -68,8 +120,28 @@ const Register = () => {
         "key" : key
       }
       try {
-          await AsyncStorage.setItem(clientID, JSON.stringify(dataToSave))
-          console.log('Data successfully saved')
+          const value = await AsyncStorage.getItem(clientID)
+          if(value !== null) {
+            Alert.alert(
+              "Register status",
+              "Username already registered",
+              [
+                {
+                  text: "Cancel",
+                  onPress: () => console.log("Cancel Pressed"),
+                  style: "cancel"
+                },
+                { text: "OK", onPress: () => null }
+              ]
+            );
+            // value previously stored
+            // console.log(value);
+          }else{
+            await AsyncStorage.setItem(clientID, JSON.stringify(dataToSave))
+            console.log('Data successfully saved');
+          }
+          
+          // asymmEncrypt();
       } catch (e) {
         // saving error
       }
@@ -87,18 +159,51 @@ const Register = () => {
       }
     }
 
-    const asymmEncrypt = async () => {
-      const message = `hello`
-      try {
-        const encodedMessage = await RSA.encrypt(message, publicKey);
-        console.log('android encoded message:', encodedMessage);
-        const decodedMessage = await RSA.decrypt(encodedMessage, privateKey);
-        console.log('android encoded message:', decodedMessage);
-      } catch (error) {
-        console.log(error)
-      }
+    // const asymmEncrypt = async () => {
+    //   try {
+    //       let authPay = clientID + ':::' + key;
+    //       const encryptedAuthPay = await RSA.encrypt(authPay, publicKey);
+    //       console.log('android encoded message:', encryptedAuthPay);
+    //       const decryptedAuthPay = await RSA.decrypt(encryptedAuthPay, privateKey);
+    //       console.log('android decoded message:', decryptedAuthPay);
+    //       var base64enc = base64.encode(encryptedAuthPay);
+    //       console.log('base64:'+ base64enc)
+    //       var base64dec = base64.decode(base64enc);
+    //       console.log('base64 dec :' + base64dec);
+    //       setAuthPayload(base64enc);
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
       
-    }
+    // }
+    
+    const signUp = () => {
+      let data = {
+          "clientID" : clientID,
+          "key" : key
+      }
+      return fetch('https://8173d14d1fee.ngrok.io/users/register', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)})
+          .then(response => {
+              if(response.ok){
+                  // await alertTwoButton('login succ')
+                  alertTwoButton('ok')
+              }else if (response.status == 400){
+                  alertTwoButton('already registered');
+              }else if (response.status == 408){
+                  alertTwoButton('conn err');
+              }
+          })
+          .catch((error) => {
+          console.error(error);
+          });
+      
+  }
 
     
       return (
@@ -114,7 +219,7 @@ const Register = () => {
                   <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
                     <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={saveAuthData}/>
                     <Button buttonStyle={styles.butlog} title="Showdata" color="#000"onPress={getAuthData}/>
-                    <Button buttonStyle={styles.butlog} title="Encrypted" color="#000"onPress={()=>{asymmEncrypt()}}/>
+                    <Button buttonStyle={styles.butlog} title="Register" color="#000"onPress={signUp}/>
                   </View>
                   {/* <Text>key : {key}</Text> */}
                   <View style={{ flex : 1 }} />

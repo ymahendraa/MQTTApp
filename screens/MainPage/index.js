@@ -24,9 +24,9 @@ const SecondRoute = () => (
   <LoginComponent/>
 );
 
-const ThirdRoute = () => (
-  <ConnectionComponent/>
-)
+// const ThirdRoute = () => (
+//   <ConnectionComponent/>
+// )
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -35,13 +35,13 @@ const mainPage = () => {
   const [routes] = useState([
     { key: 'first', title: 'Registrasi' },
     { key: 'second', title: 'Login' },
-    { key: 'third', title: 'Koneksi'}
+    // { key: 'third', title: 'Koneksi'}
   ]);
 
   const renderScene = SceneMap({
     first: FirstRoute,
     second: SecondRoute,
-    third: ThirdRoute
+    // third: ThirdRoute
   });
 
   const renderTabBar = (props) => (

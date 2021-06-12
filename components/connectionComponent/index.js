@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import CryptoJS from "react-native-crypto-js";
 import ReactNativeBiometrics from 'react-native-biometrics';
 
 ReactNativeBiometrics.createKeys('Confirm fingerprint')
@@ -61,12 +62,14 @@ ReactNativeBiometrics.biometricKeysExist()
 // console.log('biometrics failed')
 // })
 
-const Main = () => {
+const Connection = ({route}) => {
 
+    const { val } = route.params;
+    // console.log(val)
     const [address, setAddress] = useState('');
     const [port, setPort] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    // const [username, setUsername] = useState('');
+    // const [password, setPassword] = useState('');
     const [clientId, setClientId] = useState('');
   
     const [topicSub, setTopicSub] = useState('');
@@ -145,119 +148,94 @@ const Main = () => {
     // } 
   
     const mqttConnectSub = () => {
-      ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
-        .then((resultObject) => {
-        const { success } = resultObject
-  
-        if (success) {
-            console.log('successful biometrics provided')
-            MQTT.createClient({
-              uri: `${address}:${port}`,
-              clientId: clientId,
-              tls:false
-            })
-            .then(function(client) {
-            
-              client.on('closed', function() {
-                console.log('mqtt.event.closed');
-              });
-            
-              client.on('error', function(msg) {
-                console.log('mqtt.event.error', msg);
-              });
-            
-              client.on('message', function(msg) {
-                console.log('mqtt.event.message', msg);
-                setMessage(msg)
-              });
-            
-              client.on('connect', function() {
-                console.log('connected');
-                // client.subscribe(topicSub, QoS);
-              });
-            
-              client.connect();
-              })
-              .catch(function(err){
-                console.log(err);
-              });
-        } 
-        else {
-            console.log('user cancelled biometric prompt')
-        }
+        MQTT.createClient({
+          uri: `${address}:${port}`,
+          clientId: clientId,
+          tls:false
         })
-        .catch(() => {
-          console.log('biometrics failed')
-        })
+        .then(function(client) {
+        
+          client.on('closed', function() {
+            console.log('mqtt.event.closed');
+          });
+        
+          client.on('error', function(msg) {
+            console.log('mqtt.event.error', msg);
+          });
+        
+          client.on('message', function(msg) {
+            console.log('mqtt.event.message', msg);
+            setMessage(msg)
+          });
+        
+          client.on('connect', function() {
+            console.log('connected');
+            client.subscribe(topicSub, QoS);
+          });
+        
+          client.connect();
+          })
+          .catch(function(err){
+            console.log(err);
+          });
     }
   
     const mqttConnectPub = () => {
-      ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
-        .then((resultObject) => {
-        const { success } = resultObject
-  
-        if (success) {
-            console.log('successful biometrics provided')
-            MQTT.createClient({
-              uri: `${address}:${port}`,
-              clientId: clientId,
-              tls:false,
-            })
-            .then(function(client) {
-            
-              client.on('closed', function() {
-                console.log('mqtt.event.closed');
-              });
-            
-              client.on('error', function(msg) {
-                console.log('mqtt.event.error', msg);
-              });
-            
-              client.on('message', function(msg) {
-                console.log('mqtt.event.message', msg);
-                setMessage(msg)
-              });
-            
-              client.on('connect', function() {
-                console.log('connected');
-                client.publish(topicPub, data, QoS, false);
-              });
-            
-              client.connect();
-              })
-              .catch(function(err){
-                console.log(err);
-              });
+        MQTT.createClient({
+          uri: `mqtt://${val.url}:${val.port}`,
+          clientId: clientId,
+          tls:false,
+        })
+        .then(function(client) {
+        
+          client.on('closed', function() {
+            console.log('mqtt.event.closed');
+          });
+        
+          client.on('error', function(msg) {
+            console.log('mqtt.event.error', msg);
+          });
+        
+          client.on('message', function(msg) {
+            console.log('mqtt.event.message', msg);
+            setMessage(msg)
+          });
+        
+          client.on('connect', function() {
+            console.log('connected');
+            let ciphertext = CryptoJS.AES.encrypt(data, val.K1).toString(); 
+            client.publish(topicPub, ciphertext, QoS, false);
+          });
+        
+          client.connect();
+          })
+          .catch(function(err){
+            console.log(err);
+          });
         } 
-        else {
-            console.log('user cancelled biometric prompt')
-        }
-        })
-        .catch(() => {
-          console.log('biometrics failed')
-        })
-    } 
+        
+     
   
       return (
           <ScrollView style={{flex:1}}>
               <View style={{ flex: 1,alignItems:'center'}}>
                 <View style={{padding: 24,flex: 1,justifyContent: "flex-start"}}>
-                  <Text style={{fontFamily: 'Roboto', fontSize:18, marginTop: 30, marginBottom: 30, marginLeft:15,fontWeight:"bold",fontSize:30,}}>Data Koneksi</Text>
+                  <Text style={{fontFamily: 'Roboto', fontSize:18, marginTop: 30, marginBottom: 30, marginLeft:15,fontWeight:"bold",fontSize:30,}}>Connection Data</Text>
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>MQTT Broker</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
-                      <TextInput style={styles.textinp} onChangeText={(address)=> setAddress(address)} ></TextInput>   
+                      <TextInput style={styles.textinp} onChangeText={(address)=> setAddress(address)} value={val.url} ></TextInput>   
                   </View>
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Port</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
-                      <TextInput style={styles.textinp} onChangeText={(port)=> setPort(port)}></TextInput>   
+                      <TextInput style={styles.textinp} value={val.port}></TextInput>   
                   </View>
-                  <View style={{flexDirection:'row'}}>
+                  {/* <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Client ID</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
                       <TextInput style={styles.textinp} onChangeText={(clientId)=> setClientId(clientId)}></TextInput>   
-                  </View>
+                  </View> */}
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Subscribe</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
@@ -275,7 +253,7 @@ const Main = () => {
   
               <View style={{ flex: 1,alignItems:'center'}}>
                 <View style={{padding: 24,flex: 1,justifyContent: "flex-start"}}>
-                  <Text style={{fontFamily: 'Roboto', fontSize:18, marginTop: 30, marginBottom: 30, marginLeft:15,fontWeight:"bold",fontSize:30,}}>Data Publish</Text>
+                  <Text style={{fontFamily: 'Roboto', fontSize:18, marginTop: 30, marginBottom: 30, marginLeft:15,fontWeight:"bold",fontSize:30,}}>Data to Publish</Text>
                   <View style={{flexDirection:'row'}}>
                       <Text style={styles.label}>Topic</Text>
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
@@ -332,4 +310,4 @@ const Main = () => {
     
 });
 
-export default Main;
+export default Connection;
