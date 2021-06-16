@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import base64 from 'react-native-base64';
 // import { RSA } from 'react-native-rsa-native';
 import CryptoJS from "react-native-crypto-js";
-
+import { NetworkInfo } from "react-native-network-info";
 
 // const publicKey = `-----BEGIN PUBLIC KEY-----
 //         MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+Df4ahX8/VRSMZbL8s+yK68sH
@@ -48,6 +48,10 @@ import CryptoJS from "react-native-crypto-js";
 // }
 
 const Login = () => {
+    // Get Local IP
+// NetworkInfo.getIPAddress().then(ipAddress => {
+//   console.log(ipAddress);
+// });
 
     const navigation = useNavigation();
   
@@ -166,7 +170,7 @@ const Login = () => {
           "clientID" : clientID,
           "key" : key
         }
-        return fetch('https://8173d14d1fee.ngrok.io/users/authenticate', {
+        return fetch('https://0e907564dc25.ngrok.io/users/authenticate', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -339,20 +343,11 @@ const Login = () => {
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
                       <TextInput style={styles.textinp} onChangeText={(key)=> setKey(key)} ></TextInput>   
                   </View> */}
-                  <View style={{flexDirection:'row'}}>
-                        {/* <View style={{ flex: 1, alignItems: 'center', marginTop:'5%', marginLeft:'5%'}}>
-                            <Button buttonStyle={styles.butlog} title="Save Data" color="#000" onPress={asymmEncrypt}/>
-                        </View> */}
-                        <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
+                  <View style={{ flex: 1, marginTop:'20%', flexDirection:'row', alignSelf:'center'}}>                      
                             <Button buttonStyle={styles.butlog} title="Login" color="#000" onPress={loginToServer}/>
-                        </View>
-                        {/* <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
-                            <Button buttonStyle={styles.butlog} title="POST" color="#000" onPress={loginToServer}/>
-                        </View> */}
-                  </View>
-                  <View style={{ flex: 1, alignItems: 'center', marginTop:'5%',marginRight:'5%'}}>
                             <Button buttonStyle={styles.butlog} title="Broker Prop" color="#000" onPress={alertBrokerProp}/>
-                    </View>
+                  </View>
+                  
                   <View style={{ flex : 1 }} />
                 </View>    
               </View>
@@ -383,8 +378,8 @@ const Login = () => {
         borderRadius: 15,
         alignSelf: 'center',
         backgroundColor: '#000',
-        alignContent:'center'
-    },
+        marginHorizontal:10
+      },
 });
 
 export default Login;

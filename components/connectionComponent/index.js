@@ -205,6 +205,7 @@ const Connection = ({route}) => {
             console.log('connected');
             let ciphertext = CryptoJS.AES.encrypt(data, val.K1).toString(); 
             client.publish(topicPub, ciphertext, QoS, false);
+            console.log(ciphertext)
           });
         
           client.connect();

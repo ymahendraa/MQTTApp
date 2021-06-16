@@ -124,7 +124,7 @@ const Register = () => {
           if(value !== null) {
             Alert.alert(
               "Register status",
-              "Username already registered",
+              "Username already registered on this device",
               [
                 {
                   text: "Cancel",
@@ -182,7 +182,7 @@ const Register = () => {
           "clientID" : clientID,
           "key" : key
       }
-      return fetch('https://8173d14d1fee.ngrok.io/users/register', {
+      return fetch('https://0e907564dc25.ngrok.io/users/register', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -216,9 +216,11 @@ const Register = () => {
                       <Text style={{marginTop:15, fontWeight:'bold'}}>:</Text>
                       <TextInput style={styles.textinp} onChangeText={(clientID)=> setClientID(clientID)} onEndEditing={saveKey}></TextInput>   
                   </View>
-                  <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
+                  {/* <View style={{ flex: 1, alignItems: 'center', marginTop:'20%'}}>
                     <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={saveAuthData}/>
-                    <Button buttonStyle={styles.butlog} title="Showdata" color="#000"onPress={getAuthData}/>
+                  </View> */}
+                  <View style={{ flex: 1, marginTop:'20%', flexDirection:'row', alignSelf:'center'}}>
+                    <Button buttonStyle={styles.butlog} title="Simpan" color="#000" onPress={saveAuthData}/>
                     <Button buttonStyle={styles.butlog} title="Register" color="#000"onPress={signUp}/>
                   </View>
                   {/* <Text>key : {key}</Text> */}
@@ -252,8 +254,8 @@ const Register = () => {
         borderRadius: 15,
         alignSelf: 'center',
         backgroundColor: '#000',
-        alignContent:'center'
-    },
+        marginHorizontal:10
+      },
 });
 
 export default Register;
