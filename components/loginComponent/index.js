@@ -159,6 +159,9 @@ const Login = () => {
                 setKey(jsonValue.key);
                 console.log(jsonValue.key);
             }
+            else{
+              alertTwoButton('not registered')
+            }
             
         } catch(e) {
         // error reading value
@@ -170,7 +173,8 @@ const Login = () => {
           "clientID" : clientID,
           "key" : key
         }
-        return fetch('https://0e907564dc25.ngrok.io/users/authenticate', {
+        
+        return fetch('https://40f3a6a3c03a.ngrok.io/users/authenticate', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -206,6 +210,8 @@ const Login = () => {
                     alertTwoButton('not registered');
                 }else if (response.status == 408){
                     alertTwoButton('conn err');
+                }else if (response.status == 500){
+                  alertTwoButton('not registered');
                 }
             })
             .catch((error) => {
