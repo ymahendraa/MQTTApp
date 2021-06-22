@@ -96,7 +96,7 @@ const Login = () => {
         } else if (message == 'not registered') {
             Alert.alert(
                 "Login status",
-                "Username or password is incorrect",
+                "ClientID is incorrect",
                 [
                   {
                     text: "Cancel",
@@ -174,7 +174,7 @@ const Login = () => {
           "key" : key
         }
         
-        return fetch('https://40f3a6a3c03a.ngrok.io/users/authenticate', {
+        return fetch('https://568ee87adaeb.ngrok.io/users/authenticate', {
             method: 'POST',
             headers: {
               'Accept': 'application/json',

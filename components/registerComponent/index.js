@@ -69,7 +69,7 @@ const alertTwoButton = (message) => {
     case "already registered":
       Alert.alert(
         "Register status",
-        "Username already registered",
+        "ClientID already registered",
         [
           {
             text: "Cancel",
@@ -182,7 +182,7 @@ const Register = () => {
           "clientID" : clientID,
           "key" : key
       }
-      return fetch('https://40f3a6a3c03a.ngrok.io/users/register', {
+      return fetch('https://568ee87adaeb.ngrok.io/users/register', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
